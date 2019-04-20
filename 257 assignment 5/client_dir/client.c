@@ -15,7 +15,7 @@
 #include <fcntl.h>
 #include <arpa/inet.h>
 
-#define PORT "55555" // the port client will be connecting to 
+// #define PORT "55555" // the port client will be connecting to 
 
 #define MAXDATASIZE 100 // max number of bytes we can get at once 
 
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
-	if ((rv = getaddrinfo(argv[1], PORT, &hints, &servinfo)) != 0) {
+	if ((rv = getaddrinfo(argv[1], argv[2], &hints, &servinfo)) != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
 		return 1;
 	}
