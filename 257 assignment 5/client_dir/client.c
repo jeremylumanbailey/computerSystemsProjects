@@ -17,6 +17,8 @@
 
 // #define PORT "55555" // the port client will be connecting to 
 
+
+//127.0.0.1 = localhost
 #define MAXDATASIZE 100 // max number of bytes we can get at once 
 
 // get sockaddr, IPv4 or IPv6:
@@ -94,6 +96,9 @@ int main(int argc, char *argv[]) {
 	printf("client: connecting to %s\n", s);
 
 	freeaddrinfo(servinfo); // all done with this structure
+
+	if (send(sockfd, argv[3], 50, 0) == -1)
+			// exit(1);
 
 	if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
 	    perror("recv");

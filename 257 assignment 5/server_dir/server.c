@@ -21,6 +21,9 @@
 
 #define BACKLOG 10	 // how many pending connections queue will hold
 
+//Jeremy added this
+#define MAXDATASIZE 50 // max number of bytes we can get at once 
+
 
 
 // get sockaddr, IPv4 or IPv6:
@@ -37,17 +40,22 @@ int main(int argc, char *argv[]) {
 
 	int PORT = strtol(argv[1], &D, 10);		
 
-	//will return -1 if cant open 
-	int fd = open(argv[3], O_RDWR);
+	if(PORT == -1) {
+		exit(1);
+	}
 
-/*
+	 int numbytes;
+	 char stringFromClient[MAXDATASIZE];
+	//will return -1 if cant open 
+	// int fd = open(argv[3], O_RDWR);
+
+/*	MAKE SURE PORT IS WITHIN SPECIFIED RANGE
 
 	if(PORT < 50000 || PORT > 60000) {
 		fprintf(stderr,"Port out of range \n");
 	    exit(1);
 	}*/
 
-	// printf(%d\, PORT);
 
 	int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
 	struct addrinfo hints, *servinfo, *p;
@@ -132,6 +140,21 @@ int main(int argc, char *argv[]) {
 		    inet_ntop(their_addr.ss_family,
 			    get_in_addr((struct sockaddr *)&their_addr), s, sizeof s);
 		    printf("server: got connection from %s\n", s);
+
+	/////////////////////////////////////////////////////////////////
+
+		    if ((numbytes = recv(new_fd, stringFromClient, MAXDATASIZE-1, 0)) == -1) {
+	    perror("recv");
+	    exit(1);
+	}
+
+	// char arr[] = {'c','o','d','e','\0'};
+	// stringFromClient[0] = 'B';
+	stringFromClient[numbytes] = '\0';
+
+	printf("String from client:  %s\n",stringFromClient);
+
+	//////////////////////////////////////////////////////////////////////////
 
 		    if (send(new_fd, "Hello, world!", 13, 0) == -1)
 				perror("send");
