@@ -15,6 +15,9 @@
 #include <sys/wait.h>
 #include <signal.h>
 
+#include <fcntl.h>
+
+
  // #define PORT "8570"  // the port users will be connecting to
 
 
@@ -136,6 +139,8 @@ int main(int argc, char *argv[]) {
 
 
         //if statement is child function, else is parent function
+
+        /* everything inside if(PID ==0) statement could be put into a separate child function childFun() */
         if(PID == 0) {
 		    inet_ntop(their_addr.ss_family,
 			    get_in_addr((struct sockaddr *)&their_addr), s, sizeof s);
@@ -148,22 +153,63 @@ int main(int argc, char *argv[]) {
 	    exit(1);
 	}
 
-	// char arr[] = {'c','o','d','e','\0'};
+	 char arr[] = {'/','C','M','S','C','2','5','7'};
 	// stringFromClient[0] = 'B';
 	stringFromClient[numbytes] = '\0';
 
 	printf("String from client:  %s\n",stringFromClient);
 
+	//will return -1 if cant open 
+	int fd = open(stringFromClient, O_RDWR, 0666);
+
+	// printf("open return %d\n", fd);
+
+	if(fd == -1) {
+		printf("inside if statement %d\n", fd);
+		if(send(new_fd, arr, 8, 0) == -1) {
+			perror("send");
+			exit(0);
+		}
+		close(new_fd);
+		exit(0);
+	}
+
+	/* read() and send() in while loop, somewhere around here */
+
+	int nread;
+	
+    char buffer[128];
+    nread = read(fd, buffer, 50);
+    while(nread > 0) {
+
+
+
+	if(nread < 50) {
+		send(new_fd,buffer,nread,0);
+		send(new_fd,arr,8,0);
+		break;
+	}
+
+	send(new_fd,buffer,nread,0);
+
+	nread = read(fd, buffer, 50);
+
+	}
+
+	close(new_fd);
+	exit(0);
+	//while nread > 0
+
 	//////////////////////////////////////////////////////////////////////////
 
-		    if (send(new_fd, "Hello, world!", 13, 0) == -1)
-				perror("send");
-            close(new_fd);
-            exit(0);
+		  //   if (send(new_fd, buffer, nread, 0) == -1)
+				// perror("send");
+    //         close(new_fd);
+    //         exit(0);
         }
-        else { 
-            close(new_fd);
-        }
+        // else { 
+        //     close(new_fd);
+        // }
 	}
 
 	return 0;

@@ -19,7 +19,7 @@
 
 
 //127.0.0.1 = localhost
-#define MAXDATASIZE 100 // max number of bytes we can get at once 
+#define MAXDATASIZE 50 // max number of bytes we can get at once 
 
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa) {
@@ -97,8 +97,17 @@ int main(int argc, char *argv[]) {
 
 	freeaddrinfo(servinfo); // all done with this structure
 
-	if (send(sockfd, argv[3], 50, 0) == -1)
-			// exit(1);
+	if (send(sockfd, argv[3], 50, 0) == -1) {
+		perror("send");
+		exit(1);
+	}
+
+	/* recv() and write() in a while loop somewhere about here */
+
+
+
+
+	while(1) { 
 
 	if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
 	    perror("recv");
@@ -107,7 +116,19 @@ int main(int argc, char *argv[]) {
 
 	buf[numbytes] = '\0';
 
+	if(strstr(buf, "/CMSC257")) {
+		write(fd, buf, strlen(buf)-8);
+		printf("client: is going to break '%s'\n",buf);
+		break;
+	}
+
 	printf("client: received '%s'\n",buf);
+//	int sz;
+	write(fd, buf, strlen(buf));
+
+	
+
+	}
 
 	close(sockfd);
 
