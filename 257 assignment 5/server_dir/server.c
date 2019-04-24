@@ -52,12 +52,12 @@ int main(int argc, char *argv[]) {
 	//will return -1 if cant open 
 	// int fd = open(argv[3], O_RDWR);
 
-/*	MAKE SURE PORT IS WITHIN SPECIFIED RANGE
+	// MAKE SURE PORT IS WITHIN SPECIFIED RANGE
 
 	if(PORT < 50000 || PORT > 60000) {
 		fprintf(stderr,"Port out of range \n");
 	    exit(1);
-	}*/
+	}
 
 
 	int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
@@ -214,3 +214,58 @@ int main(int argc, char *argv[]) {
 
 	return 0;
 }
+
+
+/*
+close welcome socket
+With Parent SIGINT: Loop, for each child, chill(child.pid, SIGUSR1;)
+
+another loop, for each child, wait(NULL), exit(1);
+
+1) Parent SIGINT
+	{
+	
+
+		//we need 2 structs for newact and old act. leve oldact as NULL. newact you actually need to set the value
+		//
+	newact.sa_sigaction = sig_func;
+	
+	newact.sa_flags = SA_NOCLDWAIT | SA_SIGINFO;
+
+	void sig_func(int signum, siginfo *info, *ucontext);
+
+	info->si_pid;
+
+	remove pid from pool.
+
+	The "pool" meaning array[5].
+
+	sigaction(SIGCHLD, &newact, &oldact);
+
+
+
+	}
+
+2) Parent SIGCHLD
+
+
+3) Child SIGINT	
+{
+	sa_handler = IGN;
+
+}
+4) Child SIGCHLD
+{
+	sa_handler = SIG_DFL;
+}
+
+5) Child SIGUSER1
+
+	{
+	notify client close file
+	close socket
+	exxit
+	}
+
+
+*/
