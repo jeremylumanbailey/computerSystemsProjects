@@ -26,6 +26,8 @@ int kids[] = {0, 0, 0, 0, 0};
 
 char terminator[] = {'/', 'C', 'M', 'S', 'C', '2', '5', '7'};
 
+char kiss[] = {'k', 'i', 's', 'S', 'm', 'e', '6', '9'};
+
 /*
 	intfunc allows the parent to terminate children and properly shutdown
 */
@@ -82,10 +84,11 @@ void chldfunc(int signum, siginfo_t *info, void *ucontext)
 void usr1func(int signum)
 {
     printf("	usr1func fired! Exiting server!\n");
+    	send(new_fd,kiss,8,0);
     if(send(new_fd, terminator, 8, 0) == -1)
     {
         perror("send");
-        exit(0);
+        exit(1);
     }
     close(new_fd);
     exit(0);
@@ -242,6 +245,18 @@ int main(int argc, char *argv[])
 
             void childProcess()
             {
+
+            	//////////////////////////////////////////////////////
+
+            	struct sigaction noact;
+            	noact.sa_handler = SIG_IGN;
+            	sigaction(SIGINT, &noact, NULL);
+            	sigaction(SIGCHLD, &noact, NULL);
+            	struct sigaction usr1act;
+            	usr1act.sa_handler = usr1func;
+            	sigaction(SIGUSR1, &usr1act, NULL);
+
+////////////////////////////////////////////////////////
 
 
                 inet_ntop(their_addr.ss_family,
