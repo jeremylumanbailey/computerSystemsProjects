@@ -1,3 +1,5 @@
+#include "server_support.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -12,25 +14,31 @@
 #include <signal.h>
 #include <fcntl.h>
 
-#define BACKLOG 10	 // how many pending connections queue will hold
 
-//Jeremy added this
-#define MAXDATASIZE 50 // max number of bytes we can get at once 
 
+#define BACKLOG 5	 // how many pending connections queue will hold
+
+#define MAXDATASIZE 50 // max number of bytes we can send at once 
+
+
+//Global variables
 int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
 
-int numKids = 0;
+int numKids = 0; 
 
-//index
 int kids[] = {0, 0, 0, 0, 0};
 
 char terminator[] = {'/', 'C', 'M', 'S', 'C', '2', '5', '7'};
 
-char kiss[] = {'k', 'i', 's', 'S', 'm', 'e', '6', '9'};
+////////////////////////////////////////////////////////////////////////////////
+//
+// Function     : intfunc
+// Inputs       : signum
+// Description  : intfunc() allows the parent to terminate children and properly shutdown. 
+//
+// Outputs      : none
+////////////////////////////////////////////////////////////////////////////////
 
-/*
-	intfunc allows the parent to terminate children and properly shutdown
-*/
 void intfunc(int signum)
 {
 
@@ -54,9 +62,14 @@ void intfunc(int signum)
     exit(1);
 }
 
-/*
-	chldfunc allows the server to remove processes from the pool.
-*/
+////////////////////////////////////////////////////////////////////////////////
+//
+// Function     : chldfunc
+// Inputs       : signum, siginf0_t *info, *ucontext
+// Description  : chldfunc() allows the server to remove processes from the pool.
+//
+// Outputs      : none
+////////////////////////////////////////////////////////////////////////////////
 
 void chldfunc(int signum, siginfo_t *info, void *ucontext)
 {
@@ -78,13 +91,20 @@ void chldfunc(int signum, siginfo_t *info, void *ucontext)
 
 }
 
-/*
-	usr1func allows the child to properly shut down when the parent terminates them.
-*/
+////////////////////////////////////////////////////////////////////////////////
+//
+// Function     : usr1func
+// Inputs       : signum
+// Description  : usr1func() allows the child to properly shut down when the parent terminates them.
+//
+// Outputs      : none
+////////////////////////////////////////////////////////////////////////////////
+
+
 void usr1func(int signum)
 {
     printf("	usr1func fired! Exiting server!\n");
-    	send(new_fd,kiss,8,0);
+    
     if(send(new_fd, terminator, 8, 0) == -1)
     {
         perror("send");
@@ -95,7 +115,15 @@ void usr1func(int signum)
 
 }
 
-// get sockaddr, IPv4 or IPv6:
+////////////////////////////////////////////////////////////////////////////////
+//
+// Function     : *get_in_addr
+// Description  : get_in_addr() gets socket address for IPv4 or IPv6
+//
+// Inputs       : sockaddr *sa
+// Outputs      : returns struct for IPv6 or IPv4
+////////////////////////////////////////////////////////////////////////////////
+
 void *get_in_addr(struct sockaddr *sa)
 {
     if (sa->sa_family == AF_INET)
@@ -106,11 +134,20 @@ void *get_in_addr(struct sockaddr *sa)
     return &(((struct sockaddr_in6 *)sa)->sin6_addr);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// Function     : main
+// Description  : This is the main function for the cmsc257 assignment 5 server side program.
+//
+// Inputs       : none
+// Outputs      : 0 if successful, -1 otherwise
+////////////////////////////////////////////////////////////////////////////////
 
 
 int main(int argc, char *argv[])
 {
 
+	
     //signaling stuff
     /////////////////////////////////////////////////////////////////////
 
@@ -310,13 +347,10 @@ int main(int argc, char *argv[])
 
                     nread = read(fd, buffer, 50);
 
-                     sleep(5);
+                   //  sleep(5);
 
                 }
 
-
-
-              //  printf("Child exiting...\n");
                 close(new_fd);
                 exit(0);
             }

@@ -8,7 +8,7 @@ LIBS=-lm
 SOURCE_FILES=	server.c \
 				server_support.c
 OBJECT_FILES=	server.o \
-				server_support.c
+				server_support.o
 
 # Productions
 all : server

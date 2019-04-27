@@ -27,11 +27,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Function     : get_in_addr
+// Function     : *get_in_addr
 // Description  : get_in_addr() gets socket address for IPv4 or IPv6
 //
 // Inputs       : sockaddr *sa
 // Outputs      : returns struct for IPv6 or IPv4
+////////////////////////////////////////////////////////////////////////////////
 
 void *get_in_addr(struct sockaddr *sa) {
 	if (sa->sa_family == AF_INET) {
@@ -44,10 +45,11 @@ void *get_in_addr(struct sockaddr *sa) {
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Function     : main
-// Description  : This is the main function for the cmsc257 assignment 5 program.
+// Description  : This is the main function for the cmsc257 assignment 5 client side program.
 //
 // Inputs       : none
 // Outputs      : 0 if successful, -1 otherwise
+////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
 	int sockfd, numbytes;
