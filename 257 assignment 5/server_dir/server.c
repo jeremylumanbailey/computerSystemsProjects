@@ -30,6 +30,16 @@ int kids[] = {0, 0, 0, 0, 0};
 
 char terminator[] = {'/', 'C', 'M', 'S', 'C', '2', '5', '7'};
 
+char s[INET6_ADDRSTRLEN];
+
+struct addrinfo hints, *servinfo, *p;
+struct sockaddr_storage their_addr; // connector's address information
+
+int numbytes;
+
+char stringFromClient[MAXDATASIZE];
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Function     : intfunc
@@ -136,6 +146,83 @@ void *get_in_addr(struct sockaddr *sa)
 
 ////////////////////////////////////////////////////////////////////////////////
 //
+// Function     : childProcess
+// Description  : childProcess() opens the file the client is requesting 
+//				  and sends the bytes of the file to the client
+//
+// Inputs       : none
+// Outputs      : 0 if successful, -1 otherwise
+////////////////////////////////////////////////////////////////////////////////
+
+void childProcess()
+{
+	//Connection established  
+    inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *) &their_addr), s, sizeof s);
+    printf("server: got connection from %s\n", s);
+
+    //Receive filename 
+    if ((numbytes = recv(new_fd, stringFromClient, MAXDATASIZE - 1, 0)) == -1)
+    {
+        perror("recv");
+        exit(1);
+    }
+
+    char arr[] = {'/', 'C', 'M', 'S', 'C', '2', '5', '7'};
+
+    stringFromClient[numbytes] = '\0';
+
+    printf("String from client:  %s\n", stringFromClient);
+
+    //will return -1 if cant open
+    int fd = open(stringFromClient, O_RDWR, 0666);
+
+    //If server does not have file, send terminator string, close socket and kill process
+    if(fd == -1)
+    {
+        printf("Client wanted file that server does not have. %d\n", fd);
+        if(send(new_fd, arr, 8, 0) == -1)
+        {
+            perror("send");
+            exit(0);
+        }
+        close(new_fd);
+        exit(0);
+    }
+
+    int nread;
+
+    char buffer[128];
+    nread = read(fd, buffer, 50);
+
+
+    //While there is data left 
+    while(nread > 0)
+    {
+
+    	//If end of file is reached, send last of it and then send terminator string and break out of while()
+        if(nread < 50)
+        {
+            send(new_fd, buffer, nread, 0);
+            send(new_fd, arr, 8, 0);
+            break;
+        }
+        //Send 50 bytes to client
+        send(new_fd, buffer, nread, 0);
+
+        //Read 50 bytes from file
+        nread = read(fd, buffer, 50);
+
+      // Testing purposes sleep(2);
+
+    }
+
+    //Close socket & kill child process
+    close(new_fd);
+    exit(0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
 // Function     : main
 // Description  : This is the main function for the cmsc257 assignment 5 server side program.
 //
@@ -143,29 +230,23 @@ void *get_in_addr(struct sockaddr *sa)
 // Outputs      : 0 if successful, -1 otherwise
 ////////////////////////////////////////////////////////////////////////////////
 
-
 int main(int argc, char *argv[])
 {
 
-	
-    //signaling stuff
-    /////////////////////////////////////////////////////////////////////
+	//Set up signal handlers for parent processes
+	struct sigaction intact, chldact;
 
-     struct sigaction intact, chldact;
+	intact.sa_handler = intfunc;
 
-     intact.sa_handler = intfunc;
+	chldact.sa_sigaction = chldfunc;
 
-     chldact.sa_sigaction = chldfunc;
+	chldact.sa_flags = SA_NOCLDWAIT | SA_SIGINFO | SA_RESTART;
 
-     chldact.sa_flags = SA_NOCLDWAIT | SA_SIGINFO | SA_RESTART;
+	sigaction(SIGINT, &intact, NULL);
 
-     sigaction(SIGINT, &intact, NULL);
+	sigaction(SIGCHLD, &chldact, NULL);
 
-     sigaction(SIGCHLD, &chldact, NULL);
-
-
-    ////////////////////////////////////////////////////////////////////////
-
+	//Convert argument to int and check that it is valid
     char *D;
 
     int PORT = strtol(argv[1], &D, 10);
@@ -175,23 +256,21 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    int numbytes;
-    char stringFromClient[MAXDATASIZE];
+    // int numbytes;
 
-    // MAKE SURE PORT IS WITHIN SPECIFIED RANGE
+    // char stringFromClient[MAXDATASIZE];
 
+    //Checks that port is within range 
     if(PORT < 50000 || PORT > 60000)
     {
         fprintf(stderr, "Port out of range \n");
         exit(1);
     }
 
-    struct addrinfo hints, *servinfo, *p;
-    struct sockaddr_storage their_addr; // connector's address information
     socklen_t sin_size;
     int yes = 1;
 
-    char s[INET6_ADDRSTRLEN];
+
     int rv;
 
     if (argc != 2)
@@ -279,81 +358,20 @@ int main(int argc, char *argv[])
         /* everything inside if(PID ==0) statement could be put into a separate child function childFun() */
         if(PID == 0)
         {
+        	//Set up signal handlers for child processes
+	    	struct sigaction noact;
 
-            void childProcess()
-            {
+	    	noact.sa_handler = SIG_IGN;
 
-            	//////////////////////////////////////////////////////
+	    	sigaction(SIGINT, &noact, NULL);
 
-            	struct sigaction noact;
-            	noact.sa_handler = SIG_IGN;
-            	sigaction(SIGINT, &noact, NULL);
-            	sigaction(SIGCHLD, &noact, NULL);
-            	struct sigaction usr1act;
-            	usr1act.sa_handler = usr1func;
-            	sigaction(SIGUSR1, &usr1act, NULL);
+	    	sigaction(SIGCHLD, &noact, NULL);
 
-////////////////////////////////////////////////////////
+	    	struct sigaction usr1act;
 
+	    	usr1act.sa_handler = usr1func;
 
-                inet_ntop(their_addr.ss_family,
-                          get_in_addr((struct sockaddr *) &their_addr), s, sizeof s);
-                printf("server: got connection from %s\n", s);
-
-
-                if ((numbytes = recv(new_fd, stringFromClient, MAXDATASIZE - 1, 0)) == -1)
-                {
-                    perror("recv");
-                    exit(1);
-                }
-
-                char arr[] = {'/', 'C', 'M', 'S', 'C', '2', '5', '7'};
-
-                stringFromClient[numbytes] = '\0';
-
-                printf("String from client:  %s\n", stringFromClient);
-
-                //will return -1 if cant open
-                int fd = open(stringFromClient, O_RDWR, 0666);
-
-                if(fd == -1)
-                {
-                    printf("inside if statement %d\n", fd);
-                    if(send(new_fd, arr, 8, 0) == -1)
-                    {
-                        perror("send");
-                        exit(0);
-                    }
-                    close(new_fd);
-                    exit(0);
-                }
-
-
-                int nread;
-
-                char buffer[128];
-                nread = read(fd, buffer, 50);
-                while(nread > 0)
-                {
-
-                    if(nread < 50)
-                    {
-                        send(new_fd, buffer, nread, 0);
-                        send(new_fd, arr, 8, 0);
-                        break;
-                    }
-
-                    send(new_fd, buffer, nread, 0);
-
-                    nread = read(fd, buffer, 50);
-
-                   //  sleep(5);
-
-                }
-
-                close(new_fd);
-                exit(0);
-            }
+	    	sigaction(SIGUSR1, &usr1act, NULL);
 
             childProcess();
         }
