@@ -1,4 +1,12 @@
-#include "server_support.h"
+////////////////////////////////////////////////////////////////////////////////
+//
+//  File          : server.c
+//  Description   : Main server file for assignment 5 of CMSC-257.
+//                  
+//
+//  Author        : Jeremy Bailey
+//  Created       : April 2019
+//
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,37 +22,26 @@
 #include <signal.h>
 #include <fcntl.h>
 
-
-
 #define BACKLOG 5	 // how many pending connections queue will hold
-
 #define MAXDATASIZE 50 // max number of bytes we can send at once 
-
 
 //Global variables
 int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
-
 int numKids = 0; 
-
 int kids[] = {0, 0, 0, 0, 0};
-
 char terminator[] = {'/', 'C', 'M', 'S', 'C', '2', '5', '7'};
-
 char s[INET6_ADDRSTRLEN];
-
 struct addrinfo hints, *servinfo, *p;
 struct sockaddr_storage their_addr; // connector's address information
-
 int numbytes;
-
 char stringFromClient[MAXDATASIZE];
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Function     : intfunc
 // Inputs       : signum
-// Description  : intfunc() allows the parent to terminate children and properly shutdown. 
+// Description  : intfunc() allows the parent to terminate 
+//				  children and properly shutdown. 
 //
 // Outputs      : none
 ////////////////////////////////////////////////////////////////////////////////
@@ -105,7 +102,8 @@ void chldfunc(int signum, siginfo_t *info, void *ucontext)
 //
 // Function     : usr1func
 // Inputs       : signum
-// Description  : usr1func() allows the child to properly shut down when the parent terminates them.
+// Description  : usr1func() allows the child to properly shut 
+//				  down when the parent terminates them.
 //
 // Outputs      : none
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,9 +126,9 @@ void usr1func(int signum)
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Function     : *get_in_addr
+// Inputs       : sockaddr *sa
 // Description  : get_in_addr() gets socket address for IPv4 or IPv6
 //
-// Inputs       : sockaddr *sa
 // Outputs      : returns struct for IPv6 or IPv4
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -147,10 +145,10 @@ void *get_in_addr(struct sockaddr *sa)
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Function     : childProcess
+// Inputs       : none
 // Description  : childProcess() opens the file the client is requesting 
 //				  and sends the bytes of the file to the client
 //
-// Inputs       : none
 // Outputs      : 0 if successful, -1 otherwise
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -224,9 +222,9 @@ void childProcess()
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Function     : main
+// Inputs       : argc, *argv[]
 // Description  : This is the main function for the cmsc257 assignment 5 server side program.
 //
-// Inputs       : none
 // Outputs      : 0 if successful, -1 otherwise
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -256,10 +254,6 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    // int numbytes;
-
-    // char stringFromClient[MAXDATASIZE];
-
     //Checks that port is within range 
     if(PORT < 50000 || PORT > 60000)
     {
@@ -278,8 +272,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Need port argument\n");
         exit(1);
     }
-
-
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;
@@ -352,10 +344,7 @@ int main(int argc, char *argv[])
 
         PID = fork();
 
-
-        //if statement is child function, else is parent function
-
-        /* everything inside if(PID ==0) statement could be put into a separate child function childFun() */
+        //Child 
         if(PID == 0)
         {
         	//Set up signal handlers for child processes
@@ -376,8 +365,10 @@ int main(int argc, char *argv[])
             childProcess();
         }
 
+        //Parent
         else
         {
+        	//Close parent & add child to pool
             close(new_fd);
             int k;
             for(k = 0; k < 5; k++)

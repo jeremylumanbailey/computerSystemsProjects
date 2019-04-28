@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  File          : client.c
-//  Description   : Client file for assignment 5 of CMSC-257.
+//  Description   : Main client file for assignment 5 of CMSC-257.
 //                  
 //
 //  Author        : Jeremy Bailey
@@ -28,9 +28,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Function     : *get_in_addr
+// Inputs       : sockaddr *sa
 // Description  : get_in_addr() gets socket address for IPv4 or IPv6
 //
-// Inputs       : sockaddr *sa
 // Outputs      : returns struct for IPv6 or IPv4
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -45,9 +45,10 @@ void *get_in_addr(struct sockaddr *sa) {
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Function     : main
+// Inputs       : argv, *argv[]
 // Description  : This is the main function for the cmsc257 assignment 5 client side program.
 //
-// Inputs       : none
+
 // Outputs      : 0 if successful, -1 otherwise
 ////////////////////////////////////////////////////////////////////////////////
 
