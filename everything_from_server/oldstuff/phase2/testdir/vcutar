@@ -1,0 +1,173 @@
+#!/bin/bash
+
+
+quitter() {
+  arg1=$1
+  arg2=$2
+
+
+}
+
+#-------------------------#
+#This function lets the user view contents of an archive #
+#Input - name of tar file #
+#Output - list of tar file contents #
+#-------------------------#
+
+view() {
+
+  echo Input the name of the archive to be viewed.
+  read viewTar
+   if [[ "$viewTar" == ':q' ]];
+  then
+
+    echo :q detected, quiting script.
+    exit 1
+
+  fi
+  tar -tvf $viewTar
+
+}
+
+#------------------------------------------------------------------#
+#This function lets the user extract contents from a tar from the #
+#current directory to whereever they wish #
+#Input - name of tar file, where the user wants to extract the contents #
+#Output - contents of tar file #
+#------------------------------------------------------------------#
+
+extract() {
+
+  echo Input the name of the archive to be extracted.
+  read extractTar
+
+     if [[ "$extractTar" == ':q' ]];
+  then
+
+    echo :q detected, quiting script.
+    exit 1
+
+  fi
+
+  echo Input the directory to extract to /* if current directory.
+  read extractLocal
+
+       if [[ "$extractLocal" == ':q' ]];
+  then
+
+    echo :q detected, quiting script.
+    exit 1
+
+  fi
+
+  tar -xvf $extractTar -C $extractLocal
+
+}
+
+#-----------------------------------------------------------------#
+#This function lets the user archive as many files as the user wishes to archive # 
+#using a few different options. #
+#Input - tar options (vjz), what files wanted to be archived, name of archive #
+#Output - archived tar containing files #
+#-----------------------------------------------------------------#
+
+archive() {
+
+  echo Select your options:
+  echo    v - show the progress of archiving
+  echo    j - use bzip2
+  echo    z - use grzip
+
+  read userOption
+
+  if [[ "$userOption" == ':q' ]];
+  then
+
+    echo :q detected, quiting script.
+    exit 1
+
+  fi
+
+  echo Input the source directory
+  read directory
+
+  if [[ "$directory" == ':q' ]];
+  then
+
+    echo :q detected, quiting script.
+    exit 1
+
+  fi
+
+  echo Input the files/directories to archive. :q to quit, :a to proceed archiving.
+  fileToArchive=""
+  PROCEED=false
+
+  while [[ $PROCEED == false ]]; do
+
+    read TEMP 
+
+   if [[ "$TEMP" == ':q' ]];
+   then
+
+    echo :q detected, quiting script.
+    exit 1
+
+  elif [[ "$TEMP" == ':a' ]];
+  then
+
+  PROCEED=true
+
+  else
+
+    fileToArchive=$TEMP" "$fileToArchive
+
+  fi
+done
+ 
+
+  echo Input the name of the archive.
+  read outFile
+
+  if [[ "$outFile" == ':q' ]];
+  then
+
+    echo :q detected, quiting script.
+    exit 1
+
+  fi
+
+   tar -c$userOption"f" $outFile.tar.gz  -C $directory $fileToArchive
+
+}
+
+
+#-------------------------------------------------------#
+#This if statement is used for deciding what function to run depending on what the use wants to do #
+#Input - command #
+#Output - function to run #
+#-------------------------------------------------------#
+COMMAND=$1
+echo vcutar started
+echo ""
+
+if [ "$1" == 'archive' ];
+then
+
+  archive
+
+elif [ "$1" == 'extract' ];
+then
+  extract
+
+elif [ "$1" == 'view' ]; then
+  view
+
+elif [ "$1" == ":q" ];
+then
+  echo QUITING PROGRAM
+
+else
+  echo please enter something
+fi
+
