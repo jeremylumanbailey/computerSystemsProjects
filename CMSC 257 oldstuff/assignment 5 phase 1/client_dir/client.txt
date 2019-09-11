@@ -1,0 +1,29 @@
+﻿//These are comments
+
+
+Set IP from arg1 passed in                        //example: 127.0.0.1
+Set Port from arg2 passed in                        //example: 5000
+Set Filename from arg3 passed in                //example: sample.txt
+Create Socket
+Connect to Server
+Send file name to server                        //example: GET [Filename]
+Create file
+
+
+while  {
+        if(!file) {
+                Send string terminator
+                Break while
+        }
+        Send buffer stream                        //Send and receive data to and from server
+        Read buffer stream
+        
+if(Receive string terminator) {
+                Break while
+} 
+}
+
+
+Close file                                        //End session
+Close Socket
+Exit                                                //Terminate client program

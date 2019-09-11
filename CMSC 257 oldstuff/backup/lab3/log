@@ -1,0 +1,48 @@
+lab3support.c: In function ‘reverse_number_do_while’:
+lab3support.c:23:9: error: stray ‘\342’ in program
+         printf(“%d”, num%10); num = num/10; 
+         ^
+lab3support.c:23:9: error: stray ‘\200’ in program
+lab3support.c:23:9: error: stray ‘\234’ in program
+lab3support.c:23:19: error: expected expression before ‘%’ token
+         printf(“%d”, num%10); num = num/10; 
+                   ^
+lab3support.c:23:19: error: stray ‘\342’ in program
+lab3support.c:23:19: error: stray ‘\200’ in program
+lab3support.c:23:19: error: stray ‘\235’ in program
+lab3support.c:26:9: error: expected ‘;’ before ‘return’
+         return 0;
+         ^
+lab3support.c: In function ‘prime’:
+lab3support.c:57:9: error: stray ‘\342’ in program
+         printf(“Number is prime\n”); 
+         ^
+lab3support.c:57:9: error: stray ‘\200’ in program
+lab3support.c:57:9: error: stray ‘\234’ in program
+lab3support.c:57:19: error: ‘Number’ undeclared (first use in this function)
+         printf(“Number is prime\n”); 
+                   ^
+lab3support.c:57:19: note: each undeclared identifier is reported only once for each function it appears in
+lab3support.c:57:26: error: expected ‘)’ before ‘is’
+         printf(“Number is prime\n”); 
+                          ^
+lab3support.c:57:26: error: stray ‘\’ in program
+lab3support.c:57:26: error: stray ‘\342’ in program
+lab3support.c:57:26: error: stray ‘\200’ in program
+lab3support.c:57:26: error: stray ‘\235’ in program
+lab3support.c:59:9: error: stray ‘\342’ in program
+         printf(“Number is not prime\n”); 
+         ^
+lab3support.c:59:9: error: stray ‘\200’ in program
+lab3support.c:59:9: error: stray ‘\234’ in program
+lab3support.c:59:26: error: expected ‘)’ before ‘is’
+         printf(“Number is not prime\n”); 
+                          ^
+lab3support.c:59:26: error: stray ‘\’ in program
+lab3support.c:59:26: error: stray ‘\342’ in program
+lab3support.c:59:26: error: stray ‘\200’ in program
+lab3support.c:59:26: error: stray ‘\235’ in program
+lab3support.c: In function ‘reverse_number’:
+lab3support.c:61:1: error: expected declaration or statement at end of input
+ }
+ ^

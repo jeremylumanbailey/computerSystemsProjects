@@ -1,0 +1,27 @@
+#!/bin/bash
+
+pid=143897
+
+echo "Killing process $pid..."
+kill -SIGINT $pid
+
+waitAttempts=30 
+for i in $(seq 1 $waitAttempts)
+do
+    echo "Checking if process is alive (attempt #$i / $waitAttempts)..."
+    sleep 1
+
+    if ps -p $pid > /dev/null
+        then
+	        echo "Process $pid is still running"
+        else
+                echo "Process $pid has shut down successfully"
+        break
+    fi
+done
+
+if ps -p $pid > /dev/null
+     then
+           echo "Could not shut down process $pid gracefully - killing it forcibly..."
+           kill -SIGKILL $pid
+fi

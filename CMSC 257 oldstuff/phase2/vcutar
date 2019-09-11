@@ -1,0 +1,244 @@
+#!/bin/bash
+
+#-------------------------#
+#This function lets the user view contents of an archive #
+#Input - name of tar file #
+#Output - list of tar file contents #
+#-------------------------#
+
+view() {
+
+  #Message prompt to user#
+  echo Input the name of the archive to be viewed. 
+
+  #Takes input from user, whatever tar contents they want to view #
+  read viewTar
+
+  #If statement to see if they want to terminate the program#
+  if [[ "$viewTar" == ':q' ]];
+  then
+
+    #Message prompt to user#
+    echo :q detected, quiting script.
+
+    #Terminates script#
+    exit 1
+
+  fi
+
+  #Runs actual tar command to view contents of the tar the user inputed at the start#
+  tar -tvf $viewTar
+
+}
+
+#------------------------------------------------------------------#
+#This function lets the user extract contents from a tar from the #
+#current directory to whereever they wish #
+#Input - name of tar file, where the user wants to extract the contents #
+#Output - contents of tar file #
+#------------------------------------------------------------------#
+
+extract() {
+
+  #Message prompt to user#
+  echo Input the name of the archive to be extracted.
+
+  #Takes input from user, whatever tar they want exstracted# 
+  read extractTar
+
+  #If statement to check if they want to terminate the program#
+  if [[ "$extractTar" == ':q' ]];
+  then
+
+    #Message prompt to user#
+    echo :q detected, quiting script.
+
+    #Terminates program#
+    exit 1
+
+  fi
+
+  #Message prompt to user#
+  echo Input the directory to extract to /* if current directory.
+
+  #Takes input from user, whatever directory the tar file is located#
+  read extractLocal
+
+  #If statement to check if they want to terminate the program#
+  if [[ "$extractLocal" == ':q' ]];
+  then
+
+    #Message prompt to user#
+    echo :q detected, quiting script.
+
+    #Terminates program#   
+    exit 1
+
+  fi
+
+  #Runs actual tar command to extract contents from where tar the user indicated is located and name#
+  tar -xvf $extractTar -C $extractLocal
+
+}
+
+#-----------------------------------------------------------------#
+#This function lets the user archive as many files as the user wishes to archive # 
+#using a few different options. #
+#Input - tar options (vjz), what files wanted to be archived, name of archive #
+#Output - archived tar containing files #
+#-----------------------------------------------------------------#
+
+archive() {
+
+  #Message prompt to user#
+  echo Select your options:
+  echo    v - show the progress of archiving
+  echo    j - use bzip2
+  echo    z - use gzip
+
+  #Takes input from user, whatever option they want included for archiving file#
+  read userOption
+
+  #If statement to check if they want to terminate the program#
+  if [[ "$userOption" == ':q' ]];
+  then
+
+    #Message prompt to user#
+    echo :q detected, quiting script.
+
+    #Terminates program#
+    exit 1
+
+  fi
+
+  #Message prompt to user#
+  echo Input the source directory
+
+  #Takes input from user for directory location of where the files they want to archive are located#
+  read directory
+
+  #If statement to check if they want to terminate the program#
+  if [[ "$directory" == ':q' ]];
+  then
+
+    #Message prompt to user#
+    echo :q detected, quiting script.
+
+    #Terminates program#
+    exit 1
+
+  fi
+
+  #Message prompt to user#
+  echo Input the files/directories to archive. :q to quit, :a to proceed archiving.
+
+  #Define fileToArchive to be blank#
+  fileToArchive=""
+
+  #Define proceed to false as default#
+  PROCEED=false
+
+  #Begin while loop for user to continue entering in filenames until they want to stop#
+  while [[ $PROCEED == false ]]; do
+
+    #Takes input from user, this var is used to determine what part of the if else statement should #
+    #be executed. It is also used to concatenate onto the current string var#
+    read TEMP 
+
+    #If statement to check if they want to terminate the program#
+    if [[ "$TEMP" == ':q' ]];
+    then
+
+      #User prompt to user#
+      echo :q detected, quiting script.
+
+      #Terminates program#
+      exit 1
+
+      #else if that changes proceed var to true, used to exit the while loop #
+    elif [[ "$TEMP" == ':a' ]];
+    then
+
+      #Proceed is set to true#
+      PROCEED=true
+
+    else
+
+      #fileToArchive is concatenated with TEMP var with a space. Once the user is finished entering #
+      #all the files they want to archive, this var will have every file they entered separated by a space#
+      fileToArchive=$TEMP" "$fileToArchive
+
+    fi
+  done
+
+  #Message prompt to user#
+  echo Input the name of the archive.
+
+  #Takes input from user, used to determine name of archive#
+  read outFile
+
+  #If statement to check if use wants to terminate program#
+  if [[ "$outFile" == ':q' ]];
+  then
+
+    #Message prompt to user#
+    echo :q detected, quiting script.
+
+    #Terminates program#
+    exit 1
+
+  fi
+
+  #Actual tar command to create archive. command -c and f are concatenated with withever options#
+  #the used wanted to use. #
+  tar -c$userOption"f" $outFile.tgz  -C $directory $fileToArchive
+
+}
+
+
+#-------------------------------------------------------#
+#This if statement is used for deciding what function to run depending on what the use wants to do #
+#Input - command #
+#Output - function to run #
+#-------------------------------------------------------#
+
+#COMMAND is set to whatever argument the user set. This decides what function the program should run#
+COMMAND=$1
+
+#Message prompt to user#
+echo vcutar started
+echo ""
+
+#If statement to decide what function the user wants to use#
+if [ "$1" == 'archive' ];
+
+quitter() {
+  arg1=$1
+  arg2=$2
+
+
+}
+
+
+then
+  #Runs archive function#
+  archive
+
+elif [ "$1" == 'extract' ];
+then
+  #Runs extract function#
+  extract
+
+elif [ "$1" == 'view' ]; then
+  #Runs view function#
+  view
+
+elif [ "$1" == ":q" ];
+then
+  #Message prompt to user#
+  echo QUITING PROGRAM
+
+else
+  echo No argument detected.
+fi
+

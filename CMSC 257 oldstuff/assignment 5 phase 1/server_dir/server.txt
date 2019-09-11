@@ -1,0 +1,36 @@
+﻿//These are comments
+
+
+Set port to arg passed in                                //example:  5000 
+Create Socket
+Set socket options
+Bind system to network
+Listen for clients
+while client connects {
+        Accept                                         //establish client session
+        Fork child to handle client session 
+                (childPID < 0)                                 //fork failed
+(childPID > 0)                                 //parent
+Close                                  //close parent’s copy of new_fd
+        IF PID == 0 {                                        //if I got the child 
+                Read filename from socket
+                Open file
+                if(no file) {                                
+                        Send string terminator
+                        Break while
+                }
+                else {
+                        Read buffer stream                //Send and receive data to and from client
+                        Send buffer stream
+                }
+
+
+                if(end of file) {
+                        Send string terminator
+                        Break while
+                }
+                
+        }
+        else {
+                Close clients socket                        //End session
+        }
